@@ -42,7 +42,7 @@ class SignUp extends Component {
 
     // Continue with form submission to the server
     try {
-      const response = await fetch('http://45.76.251.232:3031/signup', {
+      const response = await fetch('http://155.138.193.44:3031/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password, confirmPassword }),
