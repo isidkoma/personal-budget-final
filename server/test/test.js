@@ -2,7 +2,7 @@ const axios = require("axios");
 
 
 
-const BACKEND_URL = "http://localhost:3031"; // Replace with your actual backend URL
+const BACKEND_URL = "http://45.76.251.232:3031"; // Replace with your actual backend URL
 let jwt;
 
 function testSignUp() {
