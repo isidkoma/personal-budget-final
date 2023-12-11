@@ -22,7 +22,7 @@ function Dashboard() {
   
   let barChartInstance = null;
 
-
+// eslint-disable-next-line
   useEffect(() => {
     const token = reactLocalStorage.get('jwt');
 
@@ -32,8 +32,10 @@ function Dashboard() {
     } else {
       handleError('Token not available.');
     }
+    // eslint-disable-next-line
   }, []);
-
+ 
+  // eslint-disable-next-line
   useEffect(() => {
     createPieChart(budgetData);
     createBarChart(budgetData);
@@ -42,11 +44,16 @@ function Dashboard() {
     // Cleanup function to destroy chart instances
     return () => {
       if (piechartInstance) {
+        // eslint-disable-next-line
         piechartInstance.destroy();
+        // eslint-disable-next-line
         piechartInstance = null;
       }
+      // eslint-disable-next-line
       if (barChartInstance) {
+        // eslint-disable-next-line
         barChartInstance.destroy();
+        // eslint-disable-next-line
         barChartInstance = null;
       }
       // Add similar cleanup for donut chart if applicable
@@ -182,6 +189,7 @@ function Dashboard() {
 
   const createPieChart = (budgetData) => {
     if (pieChartRef.current && !piechartInstance) {
+      // eslint-disable-next-line
       const pieChartContext = pieChartRef.current.getContext('2d');
   
       piechartInstance = new Chart(pieChartContext, {
@@ -213,73 +221,85 @@ function Dashboard() {
   
 
   const createDonutChart = (budgetData) => {
-    const width = 400;
-    const height = 400;
-    const radius = Math.min(width, height) / 2;
-
+    const width = 450;
+    const height = 450;
+    const margin = 40;
+    const radius = Math.min(width, height) / 2 - margin;
+  
     const svg = d3.select('#donutChart') // Select the SVG element with id 'donutChart'
       .append('svg')
       .attr('width', width)
       .attr('height', height)
       .append('g')
       .attr('transform', `translate(${width / 2},${height / 2})`);
-
-    const colorScale = d3.scaleOrdinal()
-      .domain(budgetData.map((d) => d.title))
-      .range(["#5a82ff", "#ff66b2", "#a1ff33", "#ff8c33", "#33ffb2", "#b233ff", "#ffd433", "#9FE2BF"]);
-
+  
+    const color = d3.scaleOrdinal()
+      .domain(budgetData.map((item) => item.title))
+      .range(budgetData.map((item) => item.color));
+  
     const pie = d3.pie()
+      .sort(null)
       .value((d) => d.budget);
-
+  
+    const data_ready = pie(budgetData);
+  
     const arc = d3.arc()
-      .outerRadius(radius - 20)
-      .innerRadius(radius - 100);
-
-    const arcs = svg.selectAll('.arc')
-      .data(pie(budgetData))
+      .innerRadius(radius * 0.5)
+      .outerRadius(radius * 0.8);
+  
+    const outerArc = d3.arc()
+      .innerRadius(radius * 0.9)
+      .outerRadius(radius * 0.9);
+  
+    svg.selectAll('allSlices')
+      .data(data_ready)
       .enter()
-      .append('g')
-      .attr('class', 'arc');
-
-    arcs.append('path')
+      .append('path')
       .attr('d', arc)
-      .attr('fill', (d) => colorScale(d.data.title));
-
-    arcs.append('line')
-      .attr('x1', (d) => arc.centroid(d)[0])
-      .attr('y1', (d) => arc.centroid(d)[1])
-      .attr('x2', (d) => {
-        const pos = arc.centroid(d);
-        const midAngle = Math.atan2(pos[1], pos[0]);
-        return Math.cos(midAngle) * (radius + 10);
+      .attr('fill', (d) => color(d.data.title))
+      .attr('stroke', 'white')
+      .style('stroke-width', '2px')
+      .style('opacity', 0.7);
+  
+    svg.selectAll('allPolylines')
+      .data(data_ready)
+      .enter()
+      .append('polyline')
+      .attr('stroke', 'black')
+      .style('fill', 'none')
+      .attr('stroke-width', 1)
+      .attr('points', function (d) {
+        const posA = arc.centroid(d);
+        const posB = outerArc.centroid(d);
+        const posC = outerArc.centroid(d);
+        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+        posC[0] = radius * 0.90 * (midangle < Math.PI ? 1 : -1);
+        return [posA, posB, posC];
+      });
+  
+    svg.selectAll('allLabels')
+      .data(data_ready)
+      .enter()
+      .append('text')
+      .text((d) => d.data.title)
+      .attr('transform', function (d) {
+        const pos = outerArc.centroid(d);
+        const midangle = d.startAngle + (d.endAngle - d.startAngle) / 2;
+        pos[0] = radius * 0.90 * (midangle < Math.PI ? 1 : -1);
+        return `translate(${pos})`;
       })
-      .attr('y2', (d) => {
-        const pos = arc.centroid(d);
-        const midAngle = Math.atan2(pos[1], pos[0]);
-        return Math.sin(midAngle) * (radius + 10);
-      })
-      .attr('stroke', 'blue');
-
-    arcs.append('text')
-      .attr('transform', (d) => {
-        const pos = arc.centroid(d);
-        const midAngle = Math.atan2(pos[1], pos[0]);
-        return `translate(${Math.cos(midAngle) * (radius + 20)},${Math.sin(midAngle) * (radius + 20)})`;
-      })
-      .attr('dy', '0.8em')
-      .style('text-anchor', (d) => {
-        const pos = arc.centroid(d);
-        return Math.cos(Math.atan2(pos[1], pos[0])) > 0 ? 'start' : 'end';
-      })
-      .text((d) => `${d.data.title} (${d.data.budget})`);
+      .style('text-anchor', function (d) {
+        const midangle = d.startAngle + 2 * (d.endAngle - d.startAngle) / 2;
+        return midangle < Math.PI ? 'start' : 'end';
+      });
   };
-
+  
  /* eslint-disable no-undef */
-
+// eslint-disable-next-line
  const createBarChart = (budgetData) => {
   if (barChartRef.current && !barChartInstance) {
     const barChartContext = barChartRef.current.getContext('2d');
-
+    // eslint-disable-next-line
     barChartInstance = new Chart(barChartContext, {
       type: 'bar',
       data: {
@@ -401,15 +421,11 @@ function Dashboard() {
         <div id="barChartHolder">
   <h2>Bar Chart</h2>
   <canvas ref={barChartRef}></canvas>
+  <div id="donutChartHolder">
+  <h2>Donut Chart</h2>
+  <div id="donutChart"></div> {/* Create a div for the D3.js chart */}
 </div>
 
-  
-        <div id="donutChartHolder">
-          <h2>Donut Chart</h2>
-          <div id="donutChart"></div> {/* Create a div for the D3.js chart */}
-        </div>
-  
-        <div>
   <h2>Budget Settings</h2>
   <div id="budgetSettings">
     {/* Input field for updating savings */}
@@ -443,3 +459,4 @@ function Dashboard() {
 }
 
 export default Dashboard;
+  
