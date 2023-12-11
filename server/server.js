@@ -12,7 +12,7 @@ const chartModel = require('./models/chart_schema');
 require('dotenv').config();
 
 const PORT = process.env.PORT || 3031;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/myAppDB';
+const MONGODB_URI = process.env.MONGODB_URI ||'mongodb+srv://purnatummala2003:Ammulu1307@cluster0.oibub3r.mongodb.net/?retryWrites=true&w=majority';
 
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB Connected'))

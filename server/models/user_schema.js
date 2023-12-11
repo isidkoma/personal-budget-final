@@ -33,16 +33,15 @@ const userSchema = new mongoose.Schema({
       },
       message: 'Password does not meet complexity requirements',
     },
+
   },
   income: {
     type: Number,
     default: 0,
   },
-  validTime: {
-    // Any tokens created before this time are considered invalid.
-    type: String,
-    required: true,
-  },
+ validTime: {
+    type: Date,
+ },
   savings: {
     type: Number,
     default: 0,
