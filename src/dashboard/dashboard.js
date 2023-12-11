@@ -14,13 +14,14 @@ function Dashboard() {
   const [color, setColor] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const lineChartRef = useRef(null);
+  const barChartRef = useRef(null);
+
   const pieChartRef = useRef(null);
 
-  let lineChartInstance = null;
   let piechartInstance = null;
   
-  
+  let barChartInstance = null;
+
 
   useEffect(() => {
     const token = reactLocalStorage.get('jwt');
@@ -35,9 +36,24 @@ function Dashboard() {
 
   useEffect(() => {
     createPieChart(budgetData);
-    createLineChart(savings, income, budgetData);
+    createBarChart(budgetData);
     createDonutChart(budgetData);
-  }, [budgetData, income, savings]);
+  
+    // Cleanup function to destroy chart instances
+    return () => {
+      if (piechartInstance) {
+        piechartInstance.destroy();
+        piechartInstance = null;
+      }
+      if (barChartInstance) {
+        barChartInstance.destroy();
+        barChartInstance = null;
+      }
+      // Add similar cleanup for donut chart if applicable
+    };
+  }, [budgetData, income, savings]); // Dependencies array, can be adjusted based on when you need to recreate the charts
+  
+  
 
   const getBudget = async (token) => {
     try {
@@ -165,50 +181,36 @@ function Dashboard() {
   
 
   const createPieChart = (budgetData) => {
-    const labels = budgetData.map((item) => item.title);
-    const data = budgetData.map((item) => item.budget);
-
-    const pieChartContext = pieChartRef.current.getContext('2d');
-
-    if (budgetData.length === 0) {
-      if (pieChartContext) {
-        pieChartContext.clearRect(0, 0, pieChartContext.canvas.width, pieChartContext.canvas.height);
-      }
-      return;
-    }
-
-    if (pieChartContext) {
+    if (pieChartRef.current && !piechartInstance) {
+      const pieChartContext = pieChartRef.current.getContext('2d');
+  
       piechartInstance = new Chart(pieChartContext, {
         type: 'pie',
         data: {
-          labels: labels,
-          datasets: [
-            {
-              data: data,
-              backgroundColor: budgetData.map((item) => item.color),
-            },
-          ],
+          labels: budgetData.map(item => item.title),
+          datasets: [{
+            data: budgetData.map(item => item.budget),
+            backgroundColor: budgetData.map(item => item.color),
+          }],
         },
         options: {
+          responsive: true,
           plugins: {
             legend: {
-              display: true,
               position: 'bottom',
             },
-            tooltip: {
-              callbacks: {
-                label: (context) => {
-                  const label = context.label || '';
-                  const value = context.parsed || 0;
-                  return `${label}: $${value.toFixed(2)}`;
-                },
-              },
+            title: {
+              display: true,
+              text: 'Budget Distribution',
             },
           },
         },
       });
     }
   };
+  
+  
+  
 
   const createDonutChart = (budgetData) => {
     const width = 400;
@@ -274,48 +276,44 @@ function Dashboard() {
 
  /* eslint-disable no-undef */
 
-const createLineChart = (savings, income, budgetData) => {
-  // Check if budgetData is defined
-  if (!budgetData) {
-    return;
-  }
+ const createBarChart = (budgetData) => {
+  if (barChartRef.current && !barChartInstance) {
+    const barChartContext = barChartRef.current.getContext('2d');
 
-  const totalBudget = budgetData.reduce((acc, item) => acc + item.budget, 0);
-  const profit = income - totalBudget;
-
-  const data = {
-    labels: ['Current', 'Projected'],
-    datasets: [
-      {
-        label: 'Balance Projection',
-        backgroundColor: profit > 0 ? '#ccffcc' : '#ffcccc',
-        data: [savings, savings + profit * 12], // Projecting for one year
+    barChartInstance = new Chart(barChartContext, {
+      type: 'bar',
+      data: {
+        labels: budgetData.map(item => item.title),
+        datasets: [{
+          label: 'Budget',
+          data: budgetData.map(item => item.budget),
+          backgroundColor: budgetData.map(item => item.color),
+          borderColor: budgetData.map(item => item.color),
+          borderWidth: 1,
+        }],
       },
-    ],
-  };
-
-  try {
-    // Destroy the existing lineChartInstance if it exists
-    if (lineChartInstance) {
-      lineChartInstance.destroy();
-    }
-
-    // Create a new lineChartInstance
-    lineChartInstance = new Chart(lineChartRef.current, {
-      type: 'line',
-      data: data,
       options: {
         scales: {
           y: {
             beginAtZero: true,
           },
         },
+        responsive: true,
+        plugins: {
+          legend: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Budget by Category',
+          },
+        },
       },
     });
-  } catch (error) {
-    console.error("Chart creation error:", error);
   }
 };
+
+
 
   
   const handleError = (message) => {
@@ -400,10 +398,11 @@ const createLineChart = (savings, income, budgetData) => {
           <canvas id="pieChart" ref={pieChartRef} width="200" height="200"></canvas>
         </div>
   
-        <div id="lineChartHolder">
-          <h2>Line Chart</h2>
-          <canvas id="lineChart" ref={lineChartRef} width="400" height="400"></canvas>
-        </div>
+        <div id="barChartHolder">
+  <h2>Bar Chart</h2>
+  <canvas ref={barChartRef}></canvas>
+</div>
+
   
         <div id="donutChartHolder">
           <h2>Donut Chart</h2>

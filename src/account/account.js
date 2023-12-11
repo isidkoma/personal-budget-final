@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
 import { reactLocalStorage } from "reactjs-localstorage";
 import { useNavigate } from "react-router-dom";
 
 const Account = () => {
     const navigate = useNavigate();
     const [username, setUsername] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage] = useState("");
 
     useEffect(() => {
         const storedUsername = reactLocalStorage.get("username");

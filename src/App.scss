@@ -112,3 +112,30 @@
   
 
 
+    #pieChartHolder, #barChartHolder {
+      
+      justify-content: center;
+  align-items: center;
+  min-height: 100vh; // 
+      max-width: 100%;
+      text-align: center;
+      margin: 0 auto; // Center the div on the page
+      padding: 20px; // Optional padding
+      #pieChart {
+        width: 150px; // Set a fixed width
+        height: 150px; // Set a fixed height to match the width
+      }
+      canvas {
+        max-width: 400px; // Adjust as needed
+        height: 400px;
+        aspect-ratio: 1 / 1; // Maintains the aspect ratio
+    
+        @media (max-width: 600px) { // Example media query for responsiveness
+          max-width: 100%;
+        }
+      }
+    
+     
+        }
+  
+    

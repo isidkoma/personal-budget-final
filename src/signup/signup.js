@@ -59,8 +59,6 @@ class SignUp extends Component {
       if (!contentType || !contentType.includes('application/json')) {
         throw new TypeError("Oops, we haven't got JSON!");
       }
-
-      const data = await response.json();
       alert('Sign-up successful!');
       this.resetForm();
     } catch (error) {
