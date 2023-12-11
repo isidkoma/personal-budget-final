@@ -1,0 +1,114 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+    /* Reset some default styles */
+    body, html {
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Define a CSS variable for primary color */
+    :root {
+      --primary-color: #61dafb;
+    }
+
+    /* Global styles */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Header styles */
+    .header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 20px;
+    }
+
+    .header h1 {
+      font-size: 2em;
+    }
+
+    /* Logo styles */
+    .logo {
+      width: 100px;
+      height: 100px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5em;
+    }
+
+    /* Link styles */
+    .link {
+      text-decoration: none;
+      color: var(--primary-color);
+      font-weight: bold;
+      margin: 10px;
+    }
+
+    .link:hover {
+      text-decoration: underline;
+    }
+
+    /* Animation styles */
+    @keyframes spin {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* Apply the animation to the logo */
+    .logo:hover {
+      animation: spin 2s linear infinite;
+    }
+  
+
+
