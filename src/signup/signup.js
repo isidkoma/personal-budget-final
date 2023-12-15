@@ -42,7 +42,7 @@ class SignUp extends Component {
 
     // Continue with form submission to the server
     try {
-      const response = await fetch('http://155.138.193.44:3031/signup', {
+      const response = await fetch('https://nbadbackend.onrender.com/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password, confirmPassword }),
