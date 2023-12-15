@@ -3,7 +3,7 @@ import Chart from 'chart.js/auto';
 import { reactLocalStorage } from 'reactjs-localstorage';
 import * as d3 from 'd3';
 
-const BACKEND_URL = "http://155.138.193.44:3031";
+const BACKEND_URL = "https://nbadbackend.onrender.com";
 
 function Dashboard() {
   const [budgetData, setBudgetData] = useState([]);
